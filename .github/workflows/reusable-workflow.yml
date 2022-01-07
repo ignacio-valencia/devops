@@ -1,4 +1,4 @@
-name: Manually triggered workflow and Call workflow
+name: Manually triggered Call workflow
 on: 
   workflow_dispatch:
     inputs:
