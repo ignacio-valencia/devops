@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: remplace vars
 
 # Controls when the workflow will run
 on:
@@ -36,5 +36,7 @@ jobs:
           echo test, and deploy your project.
           
       - uses: ignacio-valencia/replace_vars@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           who-to-greet: 'Mona Dog the Octocat'
