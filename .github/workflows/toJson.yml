@@ -1,5 +1,5 @@
 
-name: remplace vars
+name: toJson vars
 
 # Controls when the workflow will run
 on:
@@ -11,12 +11,17 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment variable source'
+        type: environment
+        required: true
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
   build:
-    environment: ${{ inputs.environment }}
+    environment: ${{ github.event.inputs.environment }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
