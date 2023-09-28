@@ -16,6 +16,7 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
+    environment: ${{ inputs.environment }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -29,3 +30,9 @@ jobs:
 
       - name: Print GitHub context from file
         run: cat github-context.json
+
+      - name: Create file with GitHub context
+        run: echo '${{ toJSON(secrets) }}' > github-secrets.json
+
+      - name: Print GitHub context from file
+        run: cat github-secrets.json
