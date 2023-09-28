@@ -41,3 +41,13 @@ jobs:
 
       - name: Print GitHub context from file
         run: cat github-secrets.json
+
+      - name: Update JSON
+        run: |
+          jq -r --argjson orig '${{ toJSON(github) }}' '. += $orig' aws/sm-schema.json > temp.json
+      
+      - name: Print GitHub context from file
+        run: cat temp.json
+
+
+
