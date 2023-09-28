@@ -41,20 +41,27 @@ jobs:
           # Ruta al archivo de destino en el repositorio
           archivo_destino=".github/aws/sm-schema.json"
 
-          # Extraer las claves y valores del objeto JSON de GitHub
+          # Extraer las claves del archivo de destino
           claves_destino=$(jq -r 'keys[]' "$archivo_destino")
-          contenido_origen="${{ toJSON(secrets) }}"
 
           # Crear un objeto JSON vacío para el resultado
           resultado="{}"
+
+          # Leer el contenido de origen de una variable de entorno de GitHub llamada ORIGEN_JSON
+          contenido_origen="${{ toJSON(secrets) }}"
 
           # Iterar sobre las claves del archivo de destino
           for clave in $claves_destino; do
             # Obtener el valor correspondiente del contenido de origen
             valor_origen=$(echo "$contenido_origen" | jq -r ".$clave")
 
-            # Agregar la clave y el valor al resultado
-            resultado=$(jq --arg clave "$clave" --arg valor "$valor_origen" '. + {($clave): $valor}' <<< "$resultado")
+            # Verificar si el valor es numérico o no nulo
+            if [[ "$valor_origen" =~ ^[0-9]+([.][0-9]+)?$ ]] || [ "$valor_origen" == "null" ]; then
+              # Agregar la clave y el valor al resultado
+              resultado=$(jq --arg clave "$clave" --arg valor "$valor_origen" '. + {($clave): $valor}' <<< "$resultado")
+            else
+              echo "Valor no válido para la clave $clave: $valor_origen"
+            fi
           done
 
           # Guardar el resultado en el archivo de destino
