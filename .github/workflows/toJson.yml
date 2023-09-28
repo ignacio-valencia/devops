@@ -38,11 +38,20 @@ jobs:
 
       - name: Update JSON
         run: |
-          jq -s 'add' <(echo '${{ toJSON(github) }}') .github/aws/sm-schema.json > temp.json
+          # Contenido de origen JSON desde la variable de GitHub
+          contenido_origen="${{ toJSON(github) }}"
 
-      - name: Print Updated JSON
-        run: |
-          cat temp.json
+          # Ruta del archivo de destino
+          archivo_destino=".github/aws/sm-schema.json"
+
+          # Nombre del archivo resultante
+          archivo_resultante="resultado.json"
+
+          # Usar jq para combinar los datos de origen y destino
+          jq -s '.[0] * .[1] | {nombre, ciudad, hobbies, direccion}' <(echo "$contenido_origen") "$archivo_destino" > "$archivo_resultante"
+
+          echo "Archivo resultante:"
+          cat "$archivo_resultante"  
 
 
 
