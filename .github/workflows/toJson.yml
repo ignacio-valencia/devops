@@ -38,11 +38,11 @@ jobs:
 
       - name: Update JSON
         run: |
-          tree -a
-          jq -r --argjson orig '${{ toJSON(github) }}' '. += $orig' .github/aws/sm-schema.json > temp.json
-      
-      - name: Print GitHub context from file
-        run: cat temp.json
+          echo '${{ toJSON(github) }}' | jq --argjson dest '$(cat .github/aws/sm-schema.json)' '. |= . + $dest' > temp.json
+  
+      - name: Print Updated JSON
+        run: |
+          cat temp.json
 
 
 
