@@ -39,26 +39,29 @@ jobs:
       - name: Update JSON
         run: |
           # Contenido de origen JSON desde la variable de GitHub
-          contenido_origen="${{ toJSON(secrets) }}"
-
+          contenido_origen="${{ toJson(github) }}"
+              
           # Ruta del archivo de destino
           archivo_destino=".github/aws/sm-schema.json"
-
+              
           # Crear un archivo temporal para el resultado
           archivo_resultante=$(mktemp)
-
+              
+          # Limpieza y formateo del contenido JSON de origen
+          contenido_origen=$(echo "$contenido_origen" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g')
+              
           # Obtener las claves comunes entre origen y destino
           claves_comunes=$(jq -n --argjson origen "$contenido_origen" --arg destino "$archivo_destino" '
               ($origen | keys_unsorted[]) as $k
               | select($k == ($destino | keys_unsorted[]))
               | $k
               ' | jq -s '.')
-
+              
           # Usar jq para combinar los datos de origen y destino utilizando las claves comunes
           jq -n --argjson origen "$contenido_origen" --arg destino "$archivo_destino" --argjson claves "$claves_comunes" '
               $origen * ($destino | with_entries(select(.key as $k | $claves | index($k))))
               ' > "$archivo_resultante"
-
+              
           echo "Archivo resultante:"
           cat "$archivo_resultante"
 
