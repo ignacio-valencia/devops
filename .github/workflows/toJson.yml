@@ -65,7 +65,10 @@ jobs:
 
             done
 
-          # Guardar el resultado en el archivo de destino
-          echo $resultado
+            # Guardar el resultado en el archivo de destino
+            echo "$resultado" > tmpl.json
+        
+            echo "Archivo resultante:"
+            cat tmpl.json
 
 
