@@ -65,8 +65,6 @@ jobs:
             done
 
           # Guardar el resultado en el archivo de destino
-          echo "$resultado" > "$archivo_destino 
-          # Guardar el resultado en el archivo de destino
           echo $resultado
 
 
