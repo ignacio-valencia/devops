@@ -38,8 +38,7 @@ jobs:
 
       - name: Update JSON
         run: |
-          echo '${{ toJSON(github) }}' | jq --argjson dest '$(cat .github/aws/sm-schema.json)' '. |= . + $dest' > temp.json
-  
+          jq -s '.[0] * .[1]' <(echo '${{ toJSON(github) }}') .github/aws/sm-schema.json > temp.json  
       - name: Print Updated JSON
         run: |
           cat temp.json
