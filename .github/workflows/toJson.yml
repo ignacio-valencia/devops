@@ -66,7 +66,16 @@ jobs:
             done > "temp.json"
 
             # Leer el resultado del archivo temporal y asignarlo a la variable resultado
-            cat "temp.json"
+            # Leer el resultado del archivo temporal y asignarlo a la variable resultado
+              resultado=$(cat "temp.json")
+                  
+              # Limpiar el archivo temporal
+              rm "temp.json"
+                  
+              echo "RESULTADO TOTAL: $resultado"
+                  
+              # Guardar el resultado en el archivo de destino
+              echo "$resultado" > "tmpl.json"
 
 
 
