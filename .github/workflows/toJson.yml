@@ -43,7 +43,7 @@ jobs:
 
           # Extraer las claves y valores del objeto JSON de GitHub
           claves_destino=$(jq -r 'keys[]' "$archivo_destino" | tr ' ' '\n')
-          contenido_origen="${{ toJSON(secrets) }}"
+          contenido_origen='${{ toJSON(secrets) }}'
 
           echo ORGINE:$contenido_origen
 
