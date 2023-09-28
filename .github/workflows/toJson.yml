@@ -45,19 +45,23 @@ jobs:
           claves_destino=$(jq -r 'keys[]' "$archivo_destino")
           contenido_origen="${{ toJSON(secrets) }}"
 
+          echo ORGINE:$contenido_origen
+
           # Crear un objeto JSON vacío para el resultado
           resultado="{}"
+
+          echo DESINO:$claves_destino
 
           # Iterar sobre las claves del archivo de destino
           echo "$claves_destino" | while IFS= read -r clave; do
             # Obtener el valor correspondiente del contenido de origen
             valor_origen=$(echo "$contenido_origen" | jq -r ".$clave")
-
+            echo CLAVE:$clave
             # Agregar la clave y el valor al resultado
-            resultado=$(jq --arg clave "$clave" --arg valor "$valor_origen" '. + {($clave): $valor}' <<< "$resultado")
+            #resultado=$(jq --arg clave "$clave" --arg valor "$valor_origen" '. + {($clave): $valor}' <<< "$resultado")
           done
 
           # Guardar el resultado en el archivo de destino
-          echo $resultado
+          #echo $resultado
 
 
