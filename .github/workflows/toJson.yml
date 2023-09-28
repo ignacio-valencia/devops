@@ -52,14 +52,24 @@ jobs:
 
           echo DESINO:$claves_destino
 
-          # Iterar sobre las claves del archivo de destino
-          echo "$claves_destino" | while IFS= read -r clave; do
-            # Obtener el valor correspondiente del contenido de origen
-            valor_origen=$(echo "$contenido_origen" | jq -r ".$clave")
-            echo CLAVE:$clave
-            # Agregar la clave y el valor al resultado
-            #resultado=$(jq --arg clave "$clave" --arg valor "$valor_origen" '. + {($clave): $valor}' <<< "$resultado")
-          done
+          # Iterar sobre las claves del archivo de destino línea por línea
+            echo "$claves_destino" | while IFS= read -r clave; do
+                echo CLAVE: "$clave"
+
+                # Obtener el valor correspondiente del contenido de origen
+                valor_origen=$(echo "$contenido_origen" | jq -r ".$clave")
+
+                # Verificar si el valor es numérico o no nulo
+                if [[ "$valor_origen" =~ ^[0-9]+([.][0-9]+)?$ ]] || [ "$valor_origen" == "null" ]; then
+                    # Agregar la clave y el valor al resultado
+                    resultado=$(jq --arg clave "$clave" --arg valor "$valor_origen" '. + {($clave): $valor}' <<< "$resultado")
+                else
+                    echo "Valor no válido para la clave $clave: $valor_origen"
+                fi
+            done
+
+            # Guardar el resultado en el archivo de destino
+            echo "$resultado" > "$archivo_destino"
 
           # Guardar el resultado en el archivo de destino
           #echo $resultado
