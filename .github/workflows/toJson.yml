@@ -63,13 +63,10 @@ jobs:
                 resultado=$(jq --arg clave "$clave" --arg valor "$valor_origen" '. + {($clave): $valor}' <<< "$resultado")
                 echo RESULTADO PARCIAL: "$resultado"
 
-            done
+            done > "temp.json"
 
-            echo RESULTADO TOTAL: "$resultado"
-            # Guardar el resultado en el archivo de destino
-            echo "$resultado" > "tmpl.json"
-        
-            echo "Archivo resultante:"
-            cat tmpl.json
+            # Leer el resultado del archivo temporal y asignarlo a la variable resultado
+            resultado=$(cat "temp.json")
+
 
 
