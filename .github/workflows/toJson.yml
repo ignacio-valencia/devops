@@ -44,28 +44,20 @@ jobs:
           # Ruta del archivo de destino
           archivo_destino=".github/aws/sm-schema.json"
               
-          # Nombre del archivo resultante
-          archivo_resultante="resultado.json"
+          # Crear un archivo temporal para el resultado
+          archivo_resultante=$(mktemp)
               
-          # Crear un objeto JSON vacío para el resultado
-          resultado="{}"
+          # Obtener las claves comunes entre origen y destino
+          claves_comunes=$(jq -n --argjson origen "$contenido_origen" --arg destino "$archivo_destino" '
+              ($origen | keys_unsorted[]) as $k
+              | select($k == ($destino | keys_unsorted[]))
+              | $k
+              ' | jq -s '.')
               
-          # Obtener las claves del contenido de origen
-          claves_origen=$(echo "$contenido_origen" | jq -r 'keys[]')
-              
-          # Iterar sobre las claves del contenido de origen
-          for clave in $claves_origen; do
-            # Verificar si la clave existe en el archivo de destino
-            if jq -e ".${clave}" "$archivo_destino" > /dev/null; then
-              # Si existe, obtener el valor del contenido de origen
-              valor_origen=$(echo "$contenido_origen" | jq -r ".$clave")
-              # Agregar la clave y el valor al resultado
-              resultado=$(echo "$resultado" | jq --arg clave "$clave" --arg valor "$valor_origen" '. + {($clave): $valor}')
-            fi
-          done
-              
-          # Guardar el resultado en un nuevo archivo
-          echo "$resultado" > "$archivo_resultante"
+          # Usar jq para combinar los datos de origen y destino utilizando las claves comunes
+          jq -n --argjson origen "$contenido_origen" --arg destino "$archivo_destino" --argjson claves "$claves_comunes" '
+              $origen * ($destino | with_entries(select(.key as $k | $claves | index($k))))
+              ' > "$archivo_resultante"
               
           echo "Archivo resultante:"
           cat "$archivo_resultante"
