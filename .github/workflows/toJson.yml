@@ -61,6 +61,7 @@ jobs:
 
                 # Agregar la clave y el valor al resultado
                 resultado=$(jq --arg clave "$clave" --arg valor "$valor_origen" '. + {($clave): $valor}' <<< "$resultado")
+                echo RESULTADO PARCIAL: "$resultado"
 
             done
 
