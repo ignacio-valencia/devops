@@ -65,6 +65,7 @@ jobs:
 
             done
 
+            echo RESULTADO TOTAL: "$resultado"
             # Guardar el resultado en el archivo de destino
             echo "$resultado" > "tmpl.json"
         
