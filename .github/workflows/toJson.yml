@@ -38,32 +38,30 @@ jobs:
 
       - name: Update JSON
         run: |
-          # Contenido de origen JSON desde la variable de GitHub
-          contenido_origen="${{ toJson(github) }}"
-              
-          # Ruta del archivo de destino
+          # Ruta al archivo de destino en el repositorio
           archivo_destino=".github/aws/sm-schema.json"
-              
-          # Crear un archivo temporal para el resultado
-          archivo_resultante=$(mktemp)
-              
-          # Limpieza y formateo del contenido JSON de origen
-          contenido_origen=$(echo "$contenido_origen" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g')
-              
-          # Obtener las claves comunes entre origen y destino
-          claves_comunes=$(jq -n --argjson origen "$contenido_origen" --arg destino "$archivo_destino" '
-              ($origen | keys_unsorted[]) as $k
-              | select($k == ($destino | keys_unsorted[]))
-              | $k
-              ' | jq -s '.')
-              
-          # Usar jq para combinar los datos de origen y destino utilizando las claves comunes
-          jq -n --argjson origen "$contenido_origen" --arg destino "$archivo_destino" --argjson claves "$claves_comunes" '
-              $origen * ($destino | with_entries(select(.key as $k | $claves | index($k))))
-              ' > "$archivo_resultante"
-              
+          
+          # Extraer las claves y valores del objeto JSON de GitHub
+          claves_destino=$(jq -r 'keys[]' "$archivo_destino")
+          contenido_origen="$GITHUB_JSON"
+          
+          # Crear un objeto JSON vacío para el resultado
+          resultado="{}"
+          
+          # Iterar sobre las claves del archivo de destino
+          for clave in $claves_destino; do
+            # Obtener el valor correspondiente del contenido de origen
+            valor_origen=$(echo "$contenido_origen" | jq -r ".$clave")
+          
+            # Agregar la clave y el valor al resultado
+            resultado=$(jq --arg clave "$clave" --arg valor "$valor_origen" '. + {($clave): $valor}' <<< "$resultado")
+          done
+          
+          # Guardar el resultado en el archivo de destino
+          echo "$resultado" > "$archivo_destino"
+          
           echo "Archivo resultante:"
-          cat "$archivo_resultante"
+          cat "$archivo_destino"
 
 
 
